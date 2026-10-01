@@ -24,21 +24,6 @@ export const getPatients = async ({ page, search }) => {
     }
 }
 
-export const deleteProducts = async ({ id }) => {
-    try {
-        const response = await axios.delete(`http://localhost:3000/products`, {
-            data: {
-                product_id: id
-            }
-        });
-        return response.data;
-    } catch (error) {
-        // Manejar errores en la solicitud
-        console.error('Error al intentar borrar el producto:', error.message);
-        throw error;  // Opcionalmente puedes volver a lanzar el error para manejarlo en otro lugar
-    }
-};
-
 export const createPatient = async ({ patientData }) => {
     if(!patientData) return;
     try {

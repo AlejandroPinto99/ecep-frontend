@@ -5,6 +5,7 @@ import {
   Route
 } from "react-router-dom";
 import { Patients } from './views/Patients';
+import { Appointments } from './views/Appointments';
 import Patient from './views/Patient';
 
 function App() {
@@ -14,6 +15,11 @@ function App() {
         <Route path="/pacientes"
           element={
             <Patients />
+          }
+        />
+        <Route path="/citas"
+          element={
+            <Appointments />
           }
         />
          <Route path="/pacientes/:id"
