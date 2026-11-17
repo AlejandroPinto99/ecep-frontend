@@ -16,7 +16,7 @@ root.render(
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="flex">
-          <div className="w-[350px]">
+          <div className="w-[280px] shrink-0">
             <Sidebar />
           </div>
           <App />

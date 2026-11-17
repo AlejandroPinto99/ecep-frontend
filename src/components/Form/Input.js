@@ -1,8 +1,8 @@
 import React from 'react'
 
 
-export const Input = ({ name, methods, placeholder, className, label = "", errorMessage, required, type, icon }) => {
-    return ( 
+export const Input = ({ name, methods, placeholder, className, label = "", errorMessage, required, type, icon, step, min, registerOptions, maxLength, inputMode, pattern, title }) => {
+    return (
         <div>
             {
                 label !== "" && (
@@ -16,10 +16,16 @@ export const Input = ({ name, methods, placeholder, className, label = "", error
                 {icon } {/* Icono al inicio */}
                 <input
                     name={name}
-                    {...methods.register(`${name}`)}
+                    {...methods.register(`${name}`, registerOptions)}
                     className={`focus:outline-none focus:ring-0 w-full ${className}`}
                     placeholder={placeholder}
                     type={type}
+                    step={step}
+                    min={min}
+                    maxLength={maxLength}
+                    inputMode={inputMode}
+                    pattern={pattern}
+                    title={title}
                     required={required}
                 />
             </div>

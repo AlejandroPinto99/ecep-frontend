@@ -8,12 +8,18 @@ import Select from "react-select";
 import { Input } from "../Form/Input";
 import Loader from "../Loader/Loader";
 
+// Helpers
+import {
+  formatTelefono,
+  mostrarTelefono,
+  soloDigitos,
+  PATRON_TELEFONO,
+} from "../../helpers/phone";
+
 // Queries
 import { useGetHospitals } from "../../hooks/hospitals/useGetHospital";
 import { useCreatePatient } from "../../hooks/useCreatePatient";
-import { useGetDepartments } from "../../hooks/departments/useGetDepartments";
 import { useGetDistricts } from "../../hooks/districts/useGetDistricts";
-import { useGetMunicipalities } from "../../hooks/municipalities/useGetMunicipalities";
 import { useGetPatientById } from "../../hooks/useGetPatients";
 import { useUpdatePatientById } from "../../hooks/useUpdatePatient";
 
@@ -21,17 +27,8 @@ export const AddPatient = ({ isEditing, setIsOpen, onSuccess = () => {} }) => {
   const { data } = useGetPatientById({ patient_id: isEditing });
   const methods = useForm();
 
-  const selectedDepartment = methods.watch("departamento");
-  const selectedMunicipality = methods.watch("municipio");
- 
   const { data: hospitals } = useGetHospitals();
-  const { data: departments } = useGetDepartments();
-  const { data: districts } = useGetDistricts({
-    id_municipio: selectedMunicipality?.value,
-  });
-  const { data: municipalities } = useGetMunicipalities({
-    departamento_id: selectedDepartment?.value,
-  });
+  const { data: districts } = useGetDistricts();
 
   const { mutate: createPatient } = useCreatePatient();
   const { mutate: updatePatient } = useUpdatePatientById({
@@ -52,9 +49,7 @@ export const AddPatient = ({ isEditing, setIsOpen, onSuccess = () => {} }) => {
             tercer_apellido: data.apellidos.split(" ")[2] || "",
             fecha_nacimiento: data.fecha_nacimiento,
             sexo: data.sexo.value,
-            numero_contacto: data.numero_contacto,
-            departamento: data.departamento.value,
-            municipio: data.municipio.value,
+            numero_contacto: soloDigitos(data.numero_contacto),
             distrito: data.distrito.value,
             direccion: data.direccion,
             hospital_nacimiento: data.hospital_nacimiento.value,
@@ -81,9 +76,7 @@ export const AddPatient = ({ isEditing, setIsOpen, onSuccess = () => {} }) => {
             tercer_apellido: data.apellidos.split(" ")[2] || "",
             fecha_nacimiento: data.fecha_nacimiento,
             sexo: data.sexo.value,
-            numero_contacto: data.numero_contacto,
-            departamento: data.departamento.value,
-            municipio: data.municipio.value,
+            numero_contacto: soloDigitos(data.numero_contacto),
             distrito: data.distrito.value,
             direccion: data.direccion,
             hospital_nacimiento: data.hospital_nacimiento.value,
@@ -107,20 +100,26 @@ export const AddPatient = ({ isEditing, setIsOpen, onSuccess = () => {} }) => {
     if (data) {
       reset({
         ...data,
-        nombres: `${data.primer_nombre} ${data.segundo_nombre} ${data.tercer_nombre}`,
-        apellidos: `${data.primer_apellido} ${data.segundo_apellido} ${data.tercer_apellido}`,
+        nombres: [data.primer_nombre, data.segundo_nombre, data.tercer_nombre]
+          .filter(Boolean)
+          .join(" "),
+        apellidos: [
+          data.primer_apellido,
+          data.segundo_apellido,
+          data.tercer_apellido,
+        ]
+          .filter(Boolean)
+          .join(" "),
+        // Un número antiguo que no tiene 8 dígitos se carga tal cual, para que
+        // el formulario pida corregirlo en lugar de recortarlo sin avisar.
+        numero_contacto: mostrarTelefono(data.numero_contacto) ?? "",
         hospital_nacimiento:
           {
             label: data.hospital_nacimiento.nombre,
             value: data.hospital_nacimiento?.id,
           } || null,
-        departamento:
-          { label: data.departamento?.nombre, value: data.departamento?.id } ||
-          null,
         distrito:
           { label: data.distrito?.nombre, value: data.distrito?.id } || null,
-        municipio:
-          { label: data.municipio?.nombre, value: data.municipio?.id } || null,
         sexo:
           {
             label: data.sexo == "M" ? "Masculino" : "Femenino",
@@ -177,7 +176,19 @@ export const AddPatient = ({ isEditing, setIsOpen, onSuccess = () => {} }) => {
               name="numero_contacto"
               label="Número de contacto"
               methods={methods}
-              type="text"
+              type="tel"
+              inputMode="numeric"
+              placeholder="0000-0000"
+              maxLength={9}
+              pattern={PATRON_TELEFONO}
+              title="El número debe tener 8 dígitos, por ejemplo 7768-6881"
+              registerOptions={{
+                onChange: (e) =>
+                  methods.setValue(
+                    "numero_contacto",
+                    formatTelefono(e.target.value),
+                  ),
+              }}
             />
             <div>
               <label className="text-sm font-semibold">
@@ -195,44 +206,6 @@ export const AddPatient = ({ isEditing, setIsOpen, onSuccess = () => {} }) => {
                   methods.setValue("hospital_nacimiento", e);
                 }}
                 value={methods.watch("hospital_nacimiento")}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-semibold">
-                Departamento<label className="text-red-600">*</label>
-              </label>
-              <Select
-                options={departments?.map((department) => {
-                  return {
-                    label: department.nombre,
-                    value: department.id_departamento,
-                  };
-                })}
-                className="rounded-lg"
-                onChange={(e) => {
-                  methods.setValue("departamento", e);
-                }}
-                value={methods.watch("departamento")}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-semibold">
-                Municipio<label className="text-red-600">*</label>
-              </label>
-              <Select
-                options={municipalities?.map((municipality) => {
-                  return {
-                    label: municipality.nombre,
-                    value: municipality.id_municipio,
-                  };
-                })}
-                className="rounded-lg"
-                onChange={(e) => {
-                  methods.setValue("municipio", e);
-                }}
-                value={methods.watch("municipio")}
                 required
               />
             </div>

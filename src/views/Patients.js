@@ -40,11 +40,13 @@ export const Patients = () => {
       cell: ({ cell }) => {
         return (
           <div className="px-4 text-center">
-            {cell.row.original.primer_nombre +
-              " " +
-              cell.row.original.segundo_nombre +
-              " " +
-              cell.row.original.tercer_nombre}
+            {[
+              cell.row.original.primer_nombre,
+              cell.row.original.segundo_nombre,
+              cell.row.original.tercer_nombre,
+            ]
+              .filter(Boolean)
+              .join(" ")}
           </div>
         );
       },
@@ -55,11 +57,12 @@ export const Patients = () => {
       cell: ({ cell }) => {
         return (
           <div className="px-4 text-center">
-            {cell.row.original.primer_apellido +
-              " " +
-              cell.row.original.segundo_apellido +
-              " " +
-              cell.row.original.tercer_apellido}
+            {[
+              cell.row.original.primer_apellido,
+              cell.row.original.segundo_apellido,
+            ]
+              .filter(Boolean)
+              .join(" ")}
           </div>
         );
       },
@@ -101,6 +104,7 @@ export const Patients = () => {
                 setRowSelected(cell.row.original.id_paciente);
               }
             }}
+            onClose={() => setRowSelected(null)}
           />
         );
       },

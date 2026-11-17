@@ -8,7 +8,7 @@ export const useCreatePsychomotorHistory = () => {
         mutationFn: ({ psychomotorData }) => createPsychomotorHistory({ psychomotorData }),
         onSuccess: () => {
         // Actualiza la cache de React Query para que los datos estén sincronizados
-        queryClient.invalidateQueries(['antecedentes_psicomotores']);
+        queryClient.invalidateQueries(['psychomotorHistory']);
         },
     });
 };

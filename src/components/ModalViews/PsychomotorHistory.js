@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 // Hooks
 import { useForm } from "react-hook-form";
@@ -7,52 +7,40 @@ import { useForm } from "react-hook-form";
 import { Input } from "../Form/Input";
 
 // Queries
-import { useGetPsychomotorParameters } from "../../hooks/psycomotor/useGetPsychomotorParameters";
 import { useCreatePsychomotorHistory } from "../../hooks/psycomotor/useCreatePyschomotorHistory";
 import { useUpdatePsychomotorHistory } from "../../hooks/psycomotor/useUpdatePsychomotorHistory";
-import {
-  useGetPsychomotorHistoryParameters,
-} from "../../hooks/psycomotor/useGetPsychomotorHistory";
-import { toast } from "react-toastify";
+
+const toNullableNumber = (value) =>
+  value === "" || value === undefined || value === null ? null : Number(value);
+
+const toNullableText = (value) =>
+  value === "" || value === undefined ? null : value;
 
 export const PsychomotorHistory = ({
   patient_id,
   setIsOpen,
   onSuccess = () => {},
   action,
-  psychomotorHistory
+  psychomotorHistory,
 }) => {
-  const {
-    data: psychomotorParameters,
-    isLoading: isLoadingPsychomotorParameters,
-  } = useGetPsychomotorParameters();
-  const {
-    data: psychomotorHistoryParameters,
-    isLoading: isLoadingPsychomotorHistoryParameters,
-  } = useGetPsychomotorHistoryParameters({
-    evaluacion_id: psychomotorHistory?.id_evaluacion,
-  });
-  const { mutate: updatePsychomotorHistory } = useUpdatePsychomotorHistory({
-    evaluation_id: psychomotorHistory?.id_evaluacion,
-  });
   const methods = useForm();
   const { mutate: createPsychomotorHistory } = useCreatePsychomotorHistory();
+  const { mutate: updatePsychomotorHistory } = useUpdatePsychomotorHistory();
+
   const onSubmitCreate = async (data) => {
-    const formattedParameters = Object.entries(data)
-      .filter(([key]) => key !== "general_observations")
-      .map(([key, value]) => ({
-        key,
-        value,
-      }));
+    const payload = {
+      edad_se_sento_meses: toNullableNumber(data.edad_se_sento_meses),
+      edad_se_paro_meses: toNullableNumber(data.edad_se_paro_meses),
+      edad_camino_meses: toNullableNumber(data.edad_camino_meses),
+      edad_primer_diente_meses: toNullableNumber(data.edad_primer_diente_meses),
+      observacion_desarrollo: toNullableText(data.observacion_desarrollo),
+    };
+
     if (action === "edit") {
       updatePsychomotorHistory(
         {
-          evaluation_id: psychomotorHistory?.id_evaluacion,
-          psychomotorData: {
-            psychomotor_parameter: formattedParameters,
-            patient_id: patient_id,
-            general_observations: data["general_observations"],
-          },
+          patient_id,
+          psychomotorData: payload,
         },
         {
           onSuccess: (data) => {
@@ -65,9 +53,8 @@ export const PsychomotorHistory = ({
       createPsychomotorHistory(
         {
           psychomotorData: {
-            psychomotor_parameter: formattedParameters,
-            patient_id: patient_id,
-            general_observations: data["general_observations"],
+            patient_id,
+            ...payload,
           },
         },
         {
@@ -81,73 +68,69 @@ export const PsychomotorHistory = ({
   };
 
   useEffect(() => {
-    if (psychomotorHistoryParameters) {
+    if (action !== "create" && psychomotorHistory) {
       methods.reset({
-        general_observations: psychomotorHistory?.observacion_general || "",
-        ...Object.values(psychomotorHistoryParameters).reduce((acc, param) => {
-          acc[param.id_parametro] = param.valor;
-          return acc;
-        }, {}),
+        edad_se_sento_meses: psychomotorHistory.edad_se_sento_meses ?? "",
+        edad_se_paro_meses: psychomotorHistory.edad_se_paro_meses ?? "",
+        edad_camino_meses: psychomotorHistory.edad_camino_meses ?? "",
+        edad_primer_diente_meses:
+          psychomotorHistory.edad_primer_diente_meses ?? "",
+        observacion_desarrollo: psychomotorHistory.observacion_desarrollo ?? "",
       });
     }
-  }, [psychomotorHistoryParameters]);
+  }, [action, psychomotorHistory]);
+
+  const isView = action === "view";
+
+  const renderField = (name, label, type = "text") =>
+    isView ? (
+      <div>
+        <label className="text-sm font-semibold">{label}</label>
+        <p className="text-gray-900">
+          {psychomotorHistory?.[name] ?? "No especificado"}
+        </p>
+      </div>
+    ) : (
+      <Input
+        name={name}
+        label={label}
+        methods={methods}
+        placeholder=""
+        type={type}
+      />
+    );
 
   return (
     <div>
-      <>
-        {!isLoadingPsychomotorParameters && (
-          <form onSubmit={methods.handleSubmit(onSubmitCreate)}>
-            <div className="grid grid-cols-2 gap-2">
-              {psychomotorParameters.map((parameter) => action !== "view" ? (
-                <Input
-                  key={parameter.id_parametro_psicomotor}
-                  name={parameter.id_parametro_psicomotor.toString()}
-                  label={parameter.nombre}
-                  methods={methods}
-                  placeholder=""
-                  type="text"
-                />
-              ) : (
-                <div key={parameter.id_parametro_psicomotor} className="flex items-center">
-                  <label className="block text-sm font-medium text-gray-700 mr-2">
-                    {parameter.nombre}
-                  </label>
-                  <span className="text-gray-900">{psychomotorHistoryParameters?.[parameter.id_parametro_psicomotor - 1]?.valor  + " meses" || "No especificado"}</span>
-                </div>
-              ))}
-            </div>
-            {
-              action !== "view" ? (
-                <Input
-                  key="general_observations"
-                  name="general_observations"
-                  label="Observaciones Generales"
-                  methods={methods}
-                  placeholder=""
-                  type="text"
-            />) : (
-              <div className="flex items-center mt-4">
-                <label className="block text-sm font-medium text-gray-700 mr-2">
-                  Observaciones Generales:
-                </label>
-                <span className="text-gray-900">
-                  {psychomotorHistory?.observacion_general || "No especificado"}
-                </span>
-              </div>
-            )
-            }
-           
-            <div className="flex w-full justify-end items-center mt-4">
-              <button
-                type="submit"
-                className=" bg-klintoRed text-white text-xl px-4 py-2 rounded-xl"
-              >
-                Guardar
-              </button>
-            </div>
-          </form>
+      <form onSubmit={methods.handleSubmit(onSubmitCreate)}>
+        <div className="grid grid-cols-2 gap-2">
+          {renderField("edad_se_sento_meses", "Edad en que se sentó (meses)", "number")}
+          {renderField("edad_se_paro_meses", "Edad en que se paró (meses)", "number")}
+          {renderField("edad_camino_meses", "Edad en que caminó (meses)", "number")}
+          {renderField(
+            "edad_primer_diente_meses",
+            "Edad del primer diente (meses)",
+            "number",
+          )}
+        </div>
+        <div className="mt-2">
+          {renderField(
+            "observacion_desarrollo",
+            "Observaciones del desarrollo",
+            "textarea",
+          )}
+        </div>
+        {!isView && (
+          <div className="flex w-full justify-end items-center mt-4">
+            <button
+              type="submit"
+              className=" bg-klintoRed text-white text-xl px-4 py-2 rounded-xl"
+            >
+              Guardar
+            </button>
+          </div>
         )}
-      </>
+      </form>
     </div>
   );
 };
