@@ -1,3 +1,5 @@
+import { fechaLocalISO } from "./date";
+
 // Formato de edades a partir de meses, para toda la app.
 
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
@@ -23,6 +25,19 @@ export const formatEdad = (meses) => {
   }
   const textoAnios = plural(anios, "año", "años");
   return resto ? `${textoAnios} y ${plural(resto, "mes", "meses")}` : textoAnios;
+};
+
+// Meses cumplidos entre dos fechas (mismo criterio que TIMESTAMPDIFF(MONTH) en
+// la API). Acepta "YYYY-MM-DD" o fechas completas de la API; se comparan como
+// día local para que la zona horaria no corra la fecha. Sin fechas devuelve null.
+export const edadEnMeses = (fechaNacimiento, fechaReferencia) => {
+  if (!fechaNacimiento || !fechaReferencia) return null;
+  const [y1, m1, d1] = fechaLocalISO(fechaNacimiento).split("-").map(Number);
+  const [y2, m2, d2] = fechaLocalISO(fechaReferencia).split("-").map(Number);
+  if ([y1, m1, d1, y2, m2, d2].some(Number.isNaN)) return null;
+  let meses = (y2 - y1) * 12 + (m2 - m1);
+  if (d2 < d1) meses -= 1;
+  return Math.max(meses, 0);
 };
 
 // Edades del esquema de vacunación: igual que formatEdad, pero 0 -> "Al nacer".

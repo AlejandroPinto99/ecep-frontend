@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { Input } from "../Form/Input";
 import { Textarea } from "../Form/Textarea";
 import { LabExamsSection } from "../LabExams/LabExamsSection";
-import { formatEdad } from "../../helpers/age";
+import { edadEnMeses, formatEdad } from "../../helpers/age";
+import { fechaLocalISO } from "../../helpers/date";
 import { useGetRevisionParameters } from "../../hooks/consultas/useGetRevisionParameters";
 
 // Formulario de consulta compartido por "Nueva consulta" y "Editar consulta".
@@ -12,7 +13,8 @@ import { useGetRevisionParameters } from "../../hooks/consultas/useGetRevisionPa
 // Props:
 //  - initialData: la consulta tal como la devuelve GET /consultas/:id (modo edición)
 //                 o null (consulta nueva).
-//  - edadMeses:   edad a mostrar (solo informativa; la API la calcula y guarda).
+//  - fechaNacimiento: del paciente, para mostrar la edad a la fecha de la
+//                 consulta (solo informativa; la API la calcula y guarda).
 //  - onSubmit(consultaData): recibe el payload listo para la API.
 //  - isPending:   mientras se guarda, todo el formulario queda bloqueado.
 
@@ -39,10 +41,12 @@ const Section = ({ title, children }) => (
 );
 
 // Valores iniciales de react-hook-form a partir de una consulta existente
+// La fecha de la consulta arranca en hoy; al editar, en la que ya tenía.
 const toDefaultValues = (consulta) => {
-  if (!consulta) return {};
+  if (!consulta) return { fecha_consulta: fechaLocalISO() };
   const { datos_consulta, examen_fisico, resultados } = consulta;
   const values = {
+    fecha_consulta: fechaLocalISO(datos_consulta.fecha_consulta),
     motivo_consulta: datos_consulta.motivo_consulta ?? "",
     signos_sintomas: datos_consulta.signos_sintomas ?? "",
     diagnostico: resultados.diagnostico ?? "",
@@ -57,8 +61,12 @@ const toDefaultValues = (consulta) => {
   return values;
 };
 
-export const ConsultationForm = ({ initialData = null, edadMeses, onSubmit, isPending, submitLabel = "Guardar" }) => {
+export const ConsultationForm = ({ initialData = null, fechaNacimiento, onSubmit, isPending, submitLabel = "Guardar" }) => {
   const methods = useForm({ defaultValues: toDefaultValues(initialData) });
+
+  // La edad sigue a la fecha elegida: si se registra una consulta pasada, se ve
+  // la edad que tenía el paciente ese día.
+  const edadMeses = edadEnMeses(fechaNacimiento, methods.watch("fecha_consulta"));
 
   // Revisiones marcadas como "Normal". Es solo estado de la pantalla: no se
   // envía; lo único que se guarda es la observación. Al editar se marcan las
@@ -110,6 +118,7 @@ export const ConsultationForm = ({ initialData = null, edadMeses, onSubmit, isPe
     if (isPending) return;
     onSubmit({
       datos_consulta: {
+        fecha_consulta: form.fecha_consulta,
         motivo_consulta: form.motivo_consulta,
         signos_sintomas: form.signos_sintomas,
       },
@@ -140,6 +149,16 @@ export const ConsultationForm = ({ initialData = null, edadMeses, onSubmit, isPe
         {/* 1. Datos de la consulta */}
         <Section title="Datos de la consulta">
           <div className="space-y-4">
+            <div className="md:w-1/2 md:pr-2">
+              <Input
+                name="fecha_consulta"
+                label="Fecha de la consulta"
+                methods={methods}
+                type="date"
+                max={fechaLocalISO()}
+                required
+              />
+            </div>
             <Input
               name="motivo_consulta"
               label="Motivo de la consulta"

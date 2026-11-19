@@ -6,26 +6,12 @@ import { ConsultationForm } from "../components/ConsultationForm/ConsultationFor
 import { useGetPatientById } from "../hooks/useGetPatients";
 import { useCreateConsulta } from "../hooks/consultas/useCreateConsulta";
 
-// Meses cumplidos a hoy (mismo criterio que TIMESTAMPDIFF(MONTH) en la API).
-// Se leen año/mes/día del texto "YYYY-MM-DD" para que la zona horaria no
-// corra la fecha al día anterior.
-const ageInMonths = (birthDate) => {
-  const [year, month, day] = String(birthDate).slice(0, 10).split("-").map(Number);
-  const now = new Date();
-  let months = (now.getFullYear() - year) * 12 + (now.getMonth() + 1 - month);
-  if (now.getDate() < day) months -= 1;
-  return Math.max(months, 0);
-};
-
 const NewConsultation = () => {
   const { id: patient_id } = useParams();
   const navigate = useNavigate();
 
   const { data: patient } = useGetPatientById({ patient_id });
   const { mutate: createConsulta, isPending } = useCreateConsulta();
-
-  // Solo informativa: la API calcula y guarda la edad por su cuenta
-  const edadMeses = patient?.fecha_nacimiento ? ageInMonths(patient.fecha_nacimiento) : null;
 
   const onSubmit = (consultaData) => {
     createConsulta(
@@ -70,7 +56,10 @@ const NewConsultation = () => {
         {patientName && <p className="text-gray-600 mt-1">Paciente: {patientName}</p>}
       </div>
 
-      <ConsultationForm edadMeses={edadMeses} onSubmit={onSubmit} isPending={isPending} />
+      <ConsultationForm
+        fechaNacimiento={patient?.fecha_nacimiento}
+        onSubmit={onSubmit} isPending={isPending}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React from 'react'
 
 
-export const Input = ({ name, methods, placeholder, className, label = "", errorMessage, required, type, icon, step, min, registerOptions, maxLength, inputMode, pattern, title }) => {
+export const Input = ({ name, methods, placeholder, className, label = "", errorMessage, required, type, icon, step, min, max, registerOptions, maxLength, inputMode, pattern, title }) => {
     return (
         <div>
             {
@@ -22,6 +22,7 @@ export const Input = ({ name, methods, placeholder, className, label = "", error
                     type={type}
                     step={step}
                     min={min}
+                    max={max}
                     maxLength={maxLength}
                     inputMode={inputMode}
                     pattern={pattern}

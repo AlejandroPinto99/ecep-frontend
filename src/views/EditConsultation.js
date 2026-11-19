@@ -57,8 +57,8 @@ const EditConsultation = () => {
       <ConsultationForm
         key={consulta.id_consulta}
         initialData={consulta}
-        // En edición se muestra la edad que tenía el paciente en esa consulta
-        edadMeses={consulta.examen_fisico.edad_meses}
+        // La edad se calcula a la fecha de la consulta (la que tenía o la nueva)
+        fechaNacimiento={consulta.fecha_nacimiento_paciente}
         onSubmit={onSubmit}
         isPending={isPending}
         submitLabel="Guardar cambios"
