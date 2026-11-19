@@ -1,11 +1,12 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { UserIcon, TableCellsIcon } from '@heroicons/react/24/solid'
+import { HomeIcon, UserIcon, TableCellsIcon } from '@heroicons/react/24/solid'
 import {
     Link,
     useLocation
 } from "react-router-dom";
 
 const ITEMS = [
+    { to: "/", label: "Dashboard", Icon: HomeIcon },
     { to: "/pacientes", label: "Pacientes", Icon: UserIcon },
     { to: "/consultas", label: "Consultas", Icon: TableCellsIcon },
 ];

@@ -33,13 +33,16 @@ export const Patients = () => {
     {
       accessorKey: "id_paciente",
       header: "id",
+      cell: ({ cell }) => (
+        <div className="px-4 text-left">{cell.row.original.id_paciente}</div>
+      ),
     },
     {
       accessorKey: "primer_nombre",
       header: "Nombres",
       cell: ({ cell }) => {
         return (
-          <div className="px-4 text-center">
+          <div className="px-4 text-left">
             {[
               cell.row.original.primer_nombre,
               cell.row.original.segundo_nombre,
@@ -56,7 +59,7 @@ export const Patients = () => {
       header: "Apellidos",
       cell: ({ cell }) => {
         return (
-          <div className="px-4 text-center">
+          <div className="px-4 text-left">
             {[
               cell.row.original.primer_apellido,
               cell.row.original.segundo_apellido,
@@ -72,7 +75,7 @@ export const Patients = () => {
       header: "Fecha de nacimiento",
       cell: ({ cell }) => {
         return (
-          <div className="px-4 text-center">
+          <div className="px-4 text-left">
             {formatDate(cell.row.original.fecha_nacimiento)}
           </div>
         );

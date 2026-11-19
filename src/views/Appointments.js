@@ -26,14 +26,14 @@ export const Appointments = () => {
       accessorKey: "id_consulta",
       header: "id",
       cell: ({ cell }) => (
-        <div className="px-4 text-center">{cell.row.original.id_consulta}</div>
+        <div className="px-4 text-left">{cell.row.original.id_consulta}</div>
       ),
     },
     {
       accessorKey: "nombre_paciente",
       header: "Nombre del paciente",
       cell: ({ cell }) => (
-        <div className="px-4 text-center">
+        <div className="px-4 text-left">
           {cell.row.original.nombre_paciente}
         </div>
       ),
@@ -42,7 +42,7 @@ export const Appointments = () => {
       accessorKey: "fecha_consulta",
       header: "Fecha",
       cell: ({ cell }) => (
-        <div className="px-4 text-center">
+        <div className="px-4 text-left">
           {formatDate(cell.row.original.fecha_consulta)}
         </div>
       ),
@@ -51,7 +51,7 @@ export const Appointments = () => {
       accessorKey: "motivo_consulta",
       header: "Motivo de consulta",
       cell: ({ cell }) => (
-        <div className="px-4 text-center truncate max-w-md mx-auto">
+        <div className="px-4 text-left truncate max-w-md">
           {cell.row.original.motivo_consulta}
         </div>
       ),

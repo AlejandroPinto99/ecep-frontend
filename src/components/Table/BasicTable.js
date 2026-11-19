@@ -14,7 +14,7 @@ const BasicTable = ({ tableColumns, tableData }) => {
             {table.getHeaderGroups()?.map(headerGroup => (
             <tr key={headerGroup.id}>
                 {headerGroup.headers?.map(header => (
-                <th key={header.id}>
+                <th key={header.id} className="px-4 py-2 text-left">
                     {flexRender(header.column.columnDef.header, header.getContext())}
                 </th>
                 ))}

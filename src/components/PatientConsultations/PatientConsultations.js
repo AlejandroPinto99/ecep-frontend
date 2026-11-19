@@ -26,7 +26,7 @@ export const PatientConsultations = ({ patient_id }) => {
       accessorKey: "fecha_consulta",
       header: "Fecha",
       cell: ({ cell }) => (
-        <div className="px-4 text-center">
+        <div className="px-4 text-left">
           {formatDate(cell.row.original.fecha_consulta)}
         </div>
       ),
@@ -35,7 +35,7 @@ export const PatientConsultations = ({ patient_id }) => {
       accessorKey: "motivo_consulta",
       header: "Motivo de consulta",
       cell: ({ cell }) => (
-        <div className="px-4 text-center truncate max-w-md mx-auto">
+        <div className="px-4 text-left truncate max-w-md">
           {cell.row.original.motivo_consulta}
         </div>
       ),
@@ -44,7 +44,7 @@ export const PatientConsultations = ({ patient_id }) => {
       accessorKey: "diagnostico",
       header: "Diagnóstico",
       cell: ({ cell }) => (
-        <div className="px-4 text-center truncate max-w-md mx-auto">
+        <div className="px-4 text-left truncate max-w-md">
           {cell.row.original.diagnostico || (
             <span className="text-gray-400">Sin diagnóstico</span>
           )}

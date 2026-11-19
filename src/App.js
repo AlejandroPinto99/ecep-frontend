@@ -4,6 +4,7 @@ import {
   Routes,
   Route
 } from "react-router-dom";
+import { Dashboard } from './views/Dashboard';
 import { Patients } from './views/Patients';
 import { Appointments } from './views/Appointments';
 import Patient from './views/Patient';
@@ -17,6 +18,11 @@ function App() {
   return (
     <div className="w-full">
       <Routes>
+        <Route path="/"
+          element={
+            <Dashboard />
+          }
+        />
         <Route path="/pacientes"
           element={
             <Patients />
