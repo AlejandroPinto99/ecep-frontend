@@ -25,6 +25,7 @@ export const VITALS = [
   { name: "circunferencia_cefalica_cm", label: "Circunferencia cefálica (cm)", step: "0.1" },
   { name: "temperatura_c", label: "Temperatura (°C)", step: "0.1" },
   { name: "frecuencia_cardiaca", label: "Frecuencia cardiaca (latidos/minuto)", step: "1" },
+  { name: "frecuencia_respiratoria", label: "Frecuencia respiratoria (respiraciones/minuto)", step: "1" },
 ];
 
 // Las revisiones se registran como "revision_<id>" para que react-hook-form
@@ -88,6 +89,12 @@ export const ConsultationForm = ({ initialData = null, fechaNacimiento, onSubmit
     });
     // Al desmarcar se limpia para que el médico escriba su propia observación
     methods.setValue(revisionField(id), checked ? NORMAL : "");
+  };
+
+  // Marca todas las revisiones como "Normal" (sobrescribe lo que se hubiera escrito)
+  const marcarTodoNormal = () => {
+    setNormalIds(new Set(revisiones.map((r) => r.id)));
+    revisiones.forEach((r) => methods.setValue(revisionField(r.id), NORMAL));
   };
 
   // Exámenes de laboratorio (se envían junto con la consulta al guardar).
@@ -207,10 +214,22 @@ export const ConsultationForm = ({ initialData = null, fechaNacimiento, onSubmit
             </div>
           </div>
 
-          <h3 className="font-semibold text-gray-800 mt-8 mb-1">Revisiones</h3>
-          <p className="text-sm text-gray-500 mb-4">
-            Solo se guardan las revisiones que tengan observación.
-          </p>
+          <div className="flex flex-wrap items-end justify-between gap-2 mt-8 mb-4">
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-1">Revisiones</h3>
+              <p className="text-sm text-gray-500">
+                Solo se guardan las revisiones que tengan observación.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={marcarTodoNormal}
+              disabled={isLoadingRevisiones || revisiones.length === 0}
+              className="border border-klintoRed text-klintoRed hover:bg-klintoRed hover:text-white rounded-lg py-1.5 px-4 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Marcar todo normal
+            </button>
+          </div>
           {isLoadingRevisiones ? (
             <p className="text-gray-500">Cargando revisiones...</p>
           ) : (

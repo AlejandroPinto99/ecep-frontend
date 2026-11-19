@@ -343,7 +343,8 @@ const Patient = () => {
           </div>
         ))}
       </div>
-      <div className="flex gap-6 mt-4">
+      <PatientConsultations patient_id={data.id_paciente} />
+      <div className="flex gap-6 mt-6">
         <div className="bg-white shadow-md rounded-lg p-6 text-start border border-klintoRed flex items-center justify-between flex-1 transition-transform duration-200 hover:scale-[1.02]">
           <p>Antecedentes perinatales</p>
           {hasHistoryData(perinatalHistory, PERINATAL_FIELDS) ? (
@@ -592,7 +593,6 @@ const Patient = () => {
           </div>
         </div>
       </div>
-      <PatientConsultations patient_id={data.id_paciente} />
     </div>
   );
 };

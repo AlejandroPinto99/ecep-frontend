@@ -72,6 +72,10 @@ const Consultation = () => {
       label: "Frecuencia cardiaca",
       value: withUnit(examen_fisico.frecuencia_cardiaca, "lpm"),
     },
+    {
+      label: "Frecuencia respiratoria",
+      value: withUnit(examen_fisico.frecuencia_respiratoria, "rpm"),
+    },
     { label: "Edad", value: formatEdad(examen_fisico.edad_meses) },
   ];
 
